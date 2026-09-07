@@ -17,9 +17,11 @@ const App = () => {
     const fetchPets = async () => {
       try {
         const fetchedPets = await petService.index();
+
         if (fetchedPets.err) {
           throw new Error(fetchedPets.err);
         }
+
         setPets(fetchedPets);
       } catch (err) {
         console.log(err);
@@ -64,8 +66,25 @@ const App = () => {
       const updatedPetList = pets.map((pet) => (
         pet._id !== updatedPet._id ? pet : updatedPet
       ));
+
       setPets(updatedPetList);
       setSelected(updatedPet);
+      setIsFormOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeletePet = async (petId) => {
+    try {
+      const deletedPet = await petService.deletePet(petId);
+
+      if (deletedPet.err) {
+        throw new Error(deletedPet.err);
+      }
+
+      setPets(pets.filter((pet) => pet._id !== deletedPet._id));
+      setSelected(null);
       setIsFormOpen(false);
     } catch (err) {
       console.log(err);
@@ -87,7 +106,11 @@ const App = () => {
           handleUpdatePet={handleUpdatePet}
         />
       ) : (
-        <PetDetail selected={selected} handleFormView={handleFormView} />
+        <PetDetail
+          selected={selected}
+          handleFormView={handleFormView}
+          handleDeletePet={handleDeletePet}
+        />
       )}
     </>
   );
